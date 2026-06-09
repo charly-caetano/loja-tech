@@ -887,6 +887,11 @@ def api_login_google():
 
 with app.app_context():
     db.create_all()
+    if not Gerente.query.first():
+        from werkzeug.security import generate_password_hash
+        novo_gerente = Gerente(nome='Admin', email='@admin', senha=generate_password_hash('admin123'))
+        db.session.add(novo_gerente)
+        db.session.commit()
 
 if __name__ == '__main__':
     print("Iniciando o servidor backend em http://127.0.0.1:5000")
