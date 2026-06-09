@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Now | Dashboard Admin</title>
+    <!-- Fonte Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Estilo Principal -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <!-- Bibliotecas de Animação e Ícones -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Globos de luz para o fundo (Glassmorphism effect) -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="logo-text" id="logoText">TECH NOW</h2>
+                <button class="icon-btn" id="toggleSidebar">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="view-dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-mensagens" onclick="carregarMensagensGerente()">
+                    <i data-lucide="message-square"></i>
+                    <span class="nav-text">Mensagens</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-vendas">
+                    <i data-lucide="home"></i>
+                    <span class="nav-text">Vendas</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-produtos">
+                    <i data-lucide="package"></i>
+                    <span class="nav-text">Produtos</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-estoque">
+                    <i data-lucide="archive"></i>
+                    <span class="nav-text">Estoque</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-clientes">
+                    <i data-lucide="users"></i>
+                    <span class="nav-text">Clientes</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-configuracoes" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px;">
+                    <i data-lucide="settings"></i>
+                    <span class="nav-text">Configurações</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Área Principal -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="search-bar">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" placeholder="Buscar pedidos, produtos..." onchange="alert('Buscando por: ' + this.value)">
+                </div>
+
+                <div class="header-actions">
+                    <button class="icon-btn relative" onclick="alert('Você tem 2 novas notificações do sistema.')" title="Notificações">
+                        <i data-lucide="bell"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <div class="user-profile" onclick="if(confirm('Deseja encerrar a sessão?')) window.location.href='/login/gerente'" title="Clique para sair" style="cursor: pointer;">
+                        <div class="user-info">
+                            <span class="user-name">Admin User</span>
+                            <span class="user-role" style="color: var(--rose-400);">Sair &rarr;</span>
+                        </div>
+                        <div class="avatar-container">
+                            <i data-lucide="log-out" class="avatar-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Conteúdo Principal Dinâmico -->
+            <main class="dashboard-content">
+                
+                <!-- ABA 1: DASHBOARD -->
+                <div id="view-dashboard" class="view-section active">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="page-title">Visão Geral</h1>
+                            <p class="page-subtitle">Acompanhe as métricas principais da Tech Now.</p>
+                        </div>
+                        <div class="content-actions">
+                            <select class="glass-select">
+                                <option value="hoje">Hoje</option>
+                                <option value="7d">Últimos 7 dias</option>
+                                <option value="30d">Últimos 30 dias</option>
+                            </select>
+                            <button class="btn-primary">Exportar Relatório</button>
+                        </div>
+                    </div>
+
+                    <!-- Grid de KPIs -->
+                    <div class="metrics-grid">
+                        <div class="metric-card antigravity-el">
+                            <div class="card-bg-gradient gradient-sky"></div>
+                            <div class="card-header">
+                                <div class="card-titles">
+                                    <h4>Faturamento</h4>
+                                    <h3 id="val-faturamento">...</h3>
+                                </div>
+                                <div class="icon-wrapper icon-sky">
+                                    <i data-lucide="dollar-sign"></i>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="badge" id="badge-faturamento">...</span>
+                                <span class="compare-text">vs. mês anterior</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card antigravity-el">
+                            <div class="card-bg-gradient gradient-emerald"></div>
+                            <div class="card-header">
+                                <div class="card-titles">
+                                    <h4>Ticket Médio</h4>
+                                    <h3 id="val-ticket">...</h3>
+                                </div>
+                                <div class="icon-wrapper icon-emerald">
+                                    <i data-lucide="trending-up"></i>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="badge" id="badge-ticket">...</span>
+                                <span class="compare-text">vs. mês anterior</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card antigravity-el">
+                            <div class="card-bg-gradient gradient-purple"></div>
+                            <div class="card-header">
+                                <div class="card-titles">
+                                    <h4>Total de Clientes</h4>
+                                    <h3 id="val-clientes">...</h3>
+                                </div>
+                                <div class="icon-wrapper icon-purple">
+                                    <i data-lucide="users"></i>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="badge" id="badge-clientes">...</span>
+                                <span class="compare-text">vs. mês anterior</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card antigravity-el">
+                            <div class="card-bg-gradient gradient-amber"></div>
+                            <div class="card-header">
+                                <div class="card-titles">
+                                    <h4>Pedidos (Mês)</h4>
+                                    <h3 id="val-pedidos">...</h3>
+                                </div>
+                                <div class="icon-wrapper icon-amber">
+                                    <i data-lucide="shopping-cart"></i>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="badge" id="badge-pedidos">...</span>
+                                <span class="compare-text">vs. mês anterior</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumo dos Gráficos -->
+                    <div class="content-header" style="margin-top: 40px;">
+                        <div>
+                            <h2 class="page-title" style="font-size: 1.5rem;">Resumo Gráfico</h2>
+                            <p class="page-subtitle">Principais indicadores visuais unificados.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div class="glass-panel" style="margin-top: 0; padding: 20px;">
+                            <div class="section-header" style="margin-bottom: 15px;"><h3 style="font-size: 1.1rem;">Vendas (Últimos 7 dias)</h3></div>
+                            <div style="height: 200px; width: 100%;"><canvas id="resumoVendasChart"></canvas></div>
+                        </div>
+                        <div class="glass-panel" style="margin-top: 0; padding: 20px;">
+                            <div class="section-header" style="margin-bottom: 15px;"><h3 style="font-size: 1.1rem;">Faturamento (Top 10)</h3></div>
+                            <div style="height: 200px; width: 100%;"><canvas id="resumoProdutosChart"></canvas></div>
+                        </div>
+                        <div class="glass-panel" style="margin-top: 0; padding: 20px;">
+                            <div class="section-header" style="margin-bottom: 15px;"><h3 style="font-size: 1.1rem;">Estoque por Categoria</h3></div>
+                            <div style="height: 200px; width: 100%;"><canvas id="resumoEstoqueChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 2: VENDAS (GRÁFICO) -->
+                <div id="view-vendas" class="view-section hidden">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="page-title">Relatório de Vendas</h1>
+                            <p class="page-subtitle">Acompanhamento do volume de vendas diário.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel" style="margin-top: 0;">
+                        <div class="section-header">
+                            <h2>Histórico de Vendas</h2>
+                            <select id="filtro-vendas" class="glass-select" onchange="carregarDashboard()" style="padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); outline: none;">
+                                <option value="7">Últimos 7 dias</option>
+                                <option value="30" selected>Últimos 30 dias</option>
+                                <option value="180">Últimos 180 dias</option>
+                                <option value="todos">Todo o período</option>
+                            </select>
+                        </div>
+                        <div style="height: 400px; width: 100%;">
+                            <canvas id="vendasChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel" style="margin-top: 24px;">
+                        <div class="section-header">
+                            <h2>Lista de Vendas</h2>
+                        </div>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código Pedido</th>
+                                        <th>Data da Venda</th>
+                                        <th>Cliente</th>
+                                        <th>Valor Faturado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-todas-vendas">
+                                    <tr><td colspan="4" class="loading-text">Carregando histórico...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- ABA 4: MENSAGENS -->
+                <div id="view-mensagens" class="view-section hidden">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="page-title">Mensagens dos Clientes</h1>
+                            <p class="page-subtitle">Comunique-se com seus clientes ou responda dúvidas.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel" style="margin-top: 0;">
+                        <div class="section-header">
+                            <h2>Caixa de Entrada</h2>
+                        </div>
+                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Cliente</th>
+                                        <th>Assunto</th>
+                                        <th>Mensagem</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-mensagens-gerente">
+                                    <tr><td colspan="5" class="loading-text">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 3: PRODUTOS (CADASTRO E ESTOQUE) -->
+                <div id="view-produtos" class="view-section hidden">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="page-title">Gestão de Produtos</h1>
+                            <p class="page-subtitle">Cadastre novos produtos para a loja do cliente.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+                        <!-- Gráfico de Barras -->
+                        <div class="glass-panel" style="margin-top: 0; display: flex; flex-direction: column;">
+                            <div class="section-header">
+                                <h2>Faturamento por Produto (Top 10)</h2>
+                            </div>
+                            <div style="position: relative; height: 320px; width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="produtosBarChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Formulario de Cadastro -->
+                        <div class="glass-panel" style="margin-top: 0;">
+                            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <h2 id="form-titulo">Novo Produto</h2>
+                                <button type="button" id="btn-cancelar-edit" class="btn-secondary hidden" onclick="cancelarEdicao()" style="padding: 4px 10px; font-size: 0.8rem;">Cancelar</button>
+                            </div>
+                            <form id="form-cadastrar-produto" style="display: flex; flex-direction: column; gap: 16px;">
+                                <div>
+                                    <label style="color: var(--text-secondary); font-size: 0.875rem;">Nome do Produto</label>
+                                    <input type="text" id="cad-nome" required style="width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                                </div>
+                                <div>
+                                    <label style="color: var(--text-secondary); font-size: 0.875rem;">Categoria</label>
+                                    <input type="text" list="categorias-list" id="cad-categoria" required placeholder="Digite ou escolha uma..." style="width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                                    <datalist id="categorias-list">
+                                        <!-- Preenchido dinamicamente via JS -->
+                                    </datalist>
+                                </div>
+                                <div style="display: flex; gap: 12px;">
+                                    <div style="flex: 1;">
+                                        <label style="color: var(--text-secondary); font-size: 0.875rem;">Preço (R$)</label>
+                                        <input type="number" step="0.01" id="cad-preco" required style="width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label style="color: var(--text-secondary); font-size: 0.875rem;">Estoque</label>
+                                        <input type="number" id="cad-estoque" required style="width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary" style="padding: 14px; margin-top: 8px;">Cadastrar na Loja</button>
+                            </form>
+
+                            <!-- Gerenciador de Imagens do Produto -->
+                            <div id="gerenciador-imagens" class="hidden" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                                <h3 style="margin-bottom: 16px; font-weight: 500;">Imagens do Produto <span id="img-produto-nome" style="color: var(--emerald-400);"></span></h3>
+                                <div id="slots-imagens" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                    <!-- Slot 1 -->
+                                    <div class="img-slot" data-slot="1" style="position: relative; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.03); border: 2px dashed rgba(255,255,255,0.1); aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.3s;">
+                                        <img id="preview-img-1" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
+                                        <div id="placeholder-1" style="text-align: center; padding: 12px;">
+                                            <i data-lucide="image-plus" style="width: 28px; height: 28px; color: var(--text-secondary); margin-bottom: 8px;"></i>
+                                            <p style="font-size: 0.75rem; color: var(--text-secondary);">Foto 1 (Frente)</p>
+                                        </div>
+                                        <input type="file" id="input-img-1" accept="image/*" style="display: none;" onchange="uploadImagem(1)">
+                                        <div id="actions-img-1" class="hidden" style="position: absolute; bottom: 6px; right: 6px; display: none; gap: 4px;">
+                                            <button onclick="trocarImagem(1)" style="background: rgba(0,0,0,0.7); border: none; border-radius: 6px; padding: 4px 8px; color: var(--emerald-400); cursor: pointer; font-size: 0.7rem;" title="Trocar"><i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i></button>
+                                            <button onclick="excluirImagem(1)" style="background: rgba(0,0,0,0.7); border: none; border-radius: 6px; padding: 4px 8px; color: var(--rose-400); cursor: pointer; font-size: 0.7rem;" title="Excluir"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                                        </div>
+                                    </div>
+                                    <!-- Slot 2 -->
+                                    <div class="img-slot" data-slot="2" style="position: relative; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.03); border: 2px dashed rgba(255,255,255,0.1); aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.3s;">
+                                        <img id="preview-img-2" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
+                                        <div id="placeholder-2" style="text-align: center; padding: 12px;">
+                                            <i data-lucide="image-plus" style="width: 28px; height: 28px; color: var(--text-secondary); margin-bottom: 8px;"></i>
+                                            <p style="font-size: 0.75rem; color: var(--text-secondary);">Foto 2 (Costas)</p>
+                                        </div>
+                                        <input type="file" id="input-img-2" accept="image/*" style="display: none;" onchange="uploadImagem(2)">
+                                        <div id="actions-img-2" class="hidden" style="position: absolute; bottom: 6px; right: 6px; display: none; gap: 4px;">
+                                            <button onclick="trocarImagem(2)" style="background: rgba(0,0,0,0.7); border: none; border-radius: 6px; padding: 4px 8px; color: var(--emerald-400); cursor: pointer; font-size: 0.7rem;" title="Trocar"><i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i></button>
+                                            <button onclick="excluirImagem(2)" style="background: rgba(0,0,0,0.7); border: none; border-radius: 6px; padding: 4px 8px; color: var(--rose-400); cursor: pointer; font-size: 0.7rem;" title="Excluir"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                                        </div>
+                                    </div>
+                                    <!-- Slot 3 -->
+                                    <div class="img-slot" data-slot="3" style="position: relative; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.03); border: 2px dashed rgba(255,255,255,0.1); aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.3s;">
+                                        <img id="preview-img-3" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
+                                        <div id="placeholder-3" style="text-align: center; padding: 12px;">
+                                            <i data-lucide="image-plus" style="width: 28px; height: 28px; color: var(--text-secondary); margin-bottom: 8px;"></i>
+                                            <p style="font-size: 0.75rem; color: var(--text-secondary);">Foto 3 (Lateral)</p>
+                                        </div>
+                                        <input type="file" id="input-img-3" accept="image/*" style="display: none;" onchange="uploadImagem(3)">
+                                        <div id="actions-img-3" class="hidden" style="position: absolute; bottom: 6px; right: 6px; display: none; gap: 4px;">
+                                            <button onclick="trocarImagem(3)" style="background: rgba(0,0,0,0.7); border: none; border-radius: 6px; padding: 4px 8px; color: var(--emerald-400); cursor: pointer; font-size: 0.7rem;" title="Trocar"><i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i></button>
+                                            <button onclick="excluirImagem(3)" style="background: rgba(0,0,0,0.7); border: none; border-radius: 6px; padding: 4px 8px; color: var(--rose-400); cursor: pointer; font-size: 0.7rem;" title="Excluir"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        
+                    <!-- Lista de Produtos Cadastrados -->
+                    <div class="glass-panel" style="margin-top: 0;">
+                        <div class="section-header">
+                            <h2>Estoque Atual</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Preço</th>
+                                        <th>Estoque</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-produtos-tbody">
+                                    <tr><td colspan="4" class="loading-text">Nenhum produto cadastrado.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA: ESTOQUE (Controle Rápido) -->
+                <div id="view-estoque" class="view-section hidden">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="page-title">Controle de Estoque</h1>
+                            <p class="page-subtitle">Gerencie as quantidades disponíveis e faça reposições rapidamente.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+                        <!-- Gráfico de Pizza -->
+                        <div class="glass-panel" style="margin-top: 0; display: flex; flex-direction: column;">
+                            <div class="section-header">
+                                <h2>Estoque por Categoria</h2>
+                            </div>
+                            <div style="position: relative; height: 300px; width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="estoqueChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Tabela de Controle -->
+                        <div class="glass-panel" style="margin-top: 0;">
+                            <div class="section-header">
+                                <h2>Reposição Rápida</h2>
+                            </div>
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="glass-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>Categoria</th>
+                                            <th>Estoque Atual</th>
+                                            <th>Status</th>
+                                            <th>Ação Rápida</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-estoque-tbody">
+                                        <tr><td colspan="5" class="loading-text">Carregando estoque...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ABA 4: CLIENTES -->
+                <div id="view-clientes" class="view-section hidden">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="page-title">Gestão de Clientes</h1>
+                            <p class="page-subtitle">Visualize os clientes cadastrados na Tech Now.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel" style="margin-top: 0;">
+                        <div class="section-header">
+                            <h2>Base de Clientes</h2>
+                            <button class="btn-secondary" onclick="alert('Função em breve')">Exportar Lista</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID / Cliente</th>
+                                        <th>Email</th>
+                                        <th>Telefone</th>
+                                        <th>Endereço</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-clientes-tbody">
+                                    <tr><td colspan="5" class="loading-text">Carregando clientes...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 5: CONFIGURAÇÕES -->
+                <div id="view-configuracoes" class="view-section hidden">
+                    <div class="content-header">
+                        <div>
+                            <h1 class="page-title">Configurações da Loja</h1>
+                            <p class="page-subtitle">Ajuste os parâmetros do sistema.</p>
+                        </div>
+                    </div>
+                    <div class="glass-panel" style="margin-top: 0; max-width: 600px;">
+                        <form id="form-configuracoes" onsubmit="event.preventDefault(); salvarConfiguracoes();" style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="form-group">
+                                <label style="color: var(--text-secondary); font-size: 0.875rem;">Nome da Loja</label>
+                                <input type="text" id="config-nome" value="Tech Now" required style="width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                            </div>
+                            <div class="form-group">
+                                <label style="color: var(--text-secondary); font-size: 0.875rem;">E-mail de Suporte</label>
+                                <input type="email" id="config-email" value="suporte@technow.com.br" required style="width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                                <div>
+                                    <h4 style="font-weight: 500;">Modo Manutenção</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Bloqueia acesso à loja cliente</p>
+                                </div>
+                                <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                                    <input type="checkbox" id="config-manutencao" style="opacity: 0; width: 0; height: 0;" onchange="toggleManutencaoUI(this)">
+                                    <span id="slider-manutencao" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 24px;">
+                                        <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            <button type="submit" id="btn-salvar-config" class="btn-primary" style="padding: 14px; margin-top: 16px;">Salvar Alterações</button>
+                        </form>
+                        <script>
+                            function toggleManutencaoUI(el) {
+                                const slider = el.nextElementSibling;
+                                const circle = slider.querySelector('span');
+                                if(el.checked) {
+                                    slider.style.backgroundColor = 'var(--rose-500)';
+                                    circle.style.transform = 'translateX(20px)';
+                                } else {
+                                    slider.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                                    circle.style.transform = 'translateX(0)';
+                                }
+                            }
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Modais do Cliente -->
+                <!-- Modal Editar Cliente -->
+                <div id="modal-edit-cliente" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 50; display: none; align-items: center; justify-content: center;">
+                    <div class="glass-panel" style="width: 100%; max-width: 450px; padding: 32px; position: relative;">
+                        <button onclick="fecharModalCliente('edit')" style="position: absolute; right: 24px; top: 24px; background: none; border: none; color: white; cursor: pointer;"><i data-lucide="x"></i></button>
+                        <h2>Editar Cliente</h2>
+                        <form id="form-edit-cliente" style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+                            <input type="hidden" id="edit-cli-id">
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary);">Nome</label>
+                                <input type="text" id="edit-cli-nome" required style="width: 100%; padding: 10px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary);">Email</label>
+                                <input type="email" id="edit-cli-email" required style="width: 100%; padding: 10px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary);">Telefone</label>
+                                <input type="text" id="edit-cli-telefone" style="width: 100%; padding: 10px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary);">Endereço</label>
+                                <input type="text" id="edit-cli-endereco" style="width: 100%; padding: 10px; margin-top: 4px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none;">
+                            </div>
+                            <button type="submit" class="btn-primary" style="padding: 12px; margin-top: 8px;">Salvar Alterações</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Modal Histórico Cliente -->
+                <div id="modal-hist-cliente" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 50; display: none; align-items: center; justify-content: center;">
+                    <div class="glass-panel" style="width: 100%; max-width: 600px; padding: 32px; position: relative;">
+                        <button onclick="fecharModalCliente('hist')" style="position: absolute; right: 24px; top: 24px; background: none; border: none; color: white; cursor: pointer;"><i data-lucide="x"></i></button>
+                        <h2 id="hist-cli-nome">Histórico de Compras</h2>
+                        <div class="table-responsive" style="max-height: 350px; overflow-y: auto; margin-top: 16px;">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID Venda</th>
+                                        <th>Data e Hora</th>
+                                        <th>Valor Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hist-cli-tbody">
+                                    <tr><td colspan="3" class="loading-text">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Script de lógicas e animações GSAP -->
+    <script src="/static/js/script.js"></script>
+
+    <!-- Socket.io -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on('nova_venda', function(data) {
+            alert('Nova Venda em Tempo Real! ' + data.message);
+            // Atualiza os dados chamando carregarDadosDashboard novamente
+            if (typeof carregarDadosDashboard === "function") {
+                carregarDadosDashboard();
+            }
+        });
+    </script>
+</body>
+
+</html>

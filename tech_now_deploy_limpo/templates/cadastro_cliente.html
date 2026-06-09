@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Cliente | Tech Now</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .input-wrapper input { padding: 10px 14px 10px 40px !important; font-size: 0.8rem !important; border-radius: 8px !important; }
+        .input-wrapper i { width: 16px !important; height: 16px !important; left: 14px !important; }
+        .form-group label { font-size: 0.8rem !important; }
+        .form-group { gap: 4px !important; }
+    </style>
+</head>
+<body class="login-body">
+    <!-- Glows em tons de Verde/Roxo para o Cliente -->
+    <div class="glow glow-1 glow-client"></div>
+    <div class="glow glow-2 glow-client"></div>
+
+    <div class="login-container" style="max-width: 520px;">
+        <div class="login-box antigravity-login" style="padding: 28px 24px;">
+            <div class="login-header" style="margin-bottom: 20px;">
+                <div class="icon-wrapper icon-emerald" style="width: max-content; margin: 0 auto 12px;">
+                    <i data-lucide="user-plus" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h2 style="font-size: 1.25rem;">Crie sua Conta</h2>
+                <p style="font-size: 0.8rem;">Junte-se à Tech Now e aproveite ofertas exclusivas</p>
+            </div>
+            
+            <form id="form-cadastro" class="login-form" style="gap: 12px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="user"></i>
+                            <input type="text" id="cad-nome" placeholder="Seu nome" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="credit-card"></i>
+                            <input type="text" id="cad-cpf" placeholder="000.000.000-00" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="mail"></i>
+                            <input type="email" id="cad-email" placeholder="seu@email.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="phone"></i>
+                            <input type="tel" id="cad-telefone" placeholder="(11) 90000-0000" required>
+                        </div>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Endereço Completo</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="map-pin"></i>
+                            <input type="text" id="cad-endereco" placeholder="Sua rua, número, cidade..." required>
+                        </div>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Senha</label>
+                        <div class="input-wrapper" style="position: relative;">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="cad-senha" placeholder="••••••••" required style="padding-right: 40px;">
+                            <button type="button" onclick="togglePassword('cad-senha', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="eye" style="width: 18px; height: 18px; margin: 0; color: inherit; position: relative; left: auto; top: auto; transform: none;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary login-btn" style="margin-top: 10px;">Criar Conta</button>
+            </form>
+            
+            <div class="login-footer" style="margin-top: 16px;">
+                <p>Já tem uma conta? <a href="/login/cliente">Fazer Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        gsap.to(".antigravity-login", {
+            y: "-=12", rotationX: -1, rotationY: 1, duration: 4, yoyo: true, repeat: -1, ease: "sine.inOut"
+        });
+
+        document.getElementById('form-cadastro').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i data-lucide="loader" class="rotating"></i> Cadastrando...';
+            lucide.createIcons();
+            btn.disabled = true;
+
+            const dados = {
+                nome: document.getElementById('cad-nome').value,
+                cpf: document.getElementById('cad-cpf').value,
+                email: document.getElementById('cad-email').value,
+                telefone: document.getElementById('cad-telefone').value,
+                endereco: document.getElementById('cad-endereco').value,
+                senha: document.getElementById('cad-senha').value
+            };
+
+            fetch('/api/clientes/cadastrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert('Cadastro realizado com sucesso! Bem-vindo à Tech Now.');
+                    window.location.href = '/login/cliente';
+                } else {
+                    alert('Erro no cadastro: ' + data.message);
+                    btn.innerHTML = 'Confirmar Cadastro';
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                alert('Erro de conexão.');
+                btn.innerHTML = 'Confirmar Cadastro';
+                btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

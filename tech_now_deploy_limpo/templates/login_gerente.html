@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Gerente | Tech Now</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="login-body">
+    <!-- Glows em tons de Azul/Índigo para o Gerente -->
+    <div class="glow glow-1 glow-admin"></div>
+    <div class="glow glow-2 glow-admin"></div>
+
+    <div class="login-container">
+        <div class="login-box antigravity-login">
+            <div class="login-header">
+                <div class="icon-wrapper icon-sky" style="width: max-content; margin: 0 auto 16px;">
+                    <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
+                </div>
+                <h2>Acesso Gerencial</h2>
+                <p>Painel Administrativo Tech Now</p>
+            </div>
+            <form id="form-login-gerente" class="login-form">
+                <div class="form-group">
+                    <label>E-mail ou Usuário</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="mail"></i>
+                        <input type="text" id="login-email" placeholder="@admin" value="@admin" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="input-wrapper" style="position: relative;">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="login-senha" placeholder="••••••••" value="admin123" required style="padding-right: 40px;">
+                        <button type="button" onclick="togglePassword('login-senha', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="eye" style="width: 18px; height: 18px; margin: 0; color: inherit; position: relative; left: auto; top: auto; transform: none;"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary login-btn">Entrar no Dashboard</button>
+            </form>
+            <div class="login-footer">
+                <p><a href="/login/cliente" style="color: var(--text-secondary);">Ir para Login do Cliente &rarr;</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+        // Efeito de levitação exclusivo na caixa de login
+        gsap.to(".antigravity-login", {
+            y: "-=12",
+            rotationX: 1.5,
+            rotationY: -1.5,
+            duration: 4,
+            yoyo: true,
+            repeat: -1,
+            ease: "sine.inOut"
+        });
+
+        document.getElementById('form-login-gerente').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const oldText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="rotating"></i> Entrando...';
+            lucide.createIcons();
+            btn.disabled = true;
+
+            const dados = {
+                email: document.getElementById('login-email').value,
+                senha: document.getElementById('login-senha').value
+            };
+
+            fetch('/api/login/gerente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    window.location.href = '/painel-gerente';
+                } else {
+                    alert('Erro no login: ' + data.message);
+                    btn.innerHTML = oldText;
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                alert('Erro de conexão.');
+                btn.innerHTML = oldText;
+                btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

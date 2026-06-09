@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Now | O Futuro da Tecnologia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --emerald-500: #10b981;
+            --emerald-600: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navbar Corporativa */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            background: rgba(10, 10, 15, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            color: var(--emerald-500);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-text {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .btn-text:hover {
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-dark);
+            padding: 10px 24px;
+            border-radius: 99px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            padding-top: 80px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('/static/img/landing_bg.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            opacity: 0.6;
+            mask-image: linear-gradient(to right, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 40%, transparent 100%);
+        }
+
+        .hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(16, 185, 129, 0.15), transparent 50%),
+                        linear-gradient(90deg, var(--bg-dark) 0%, rgba(10, 10, 15, 0.4) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 650px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--emerald-500);
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero h1 span {
+            color: var(--emerald-500);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 500px;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn-shop {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--emerald-500);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 99px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-shop:hover {
+            background: var(--emerald-600);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .hero-bg { opacity: 0.3; mask-image: none; -webkit-mask-image: none; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Corporativa -->
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <i data-lucide="cpu" class="logo-icon"></i>
+            Tech Now
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#">Laptops</a></li>
+            <li><a href="#">Smartphones</a></li>
+            <li><a href="#">Hardware</a></li>
+            <li><a href="#">Periféricos</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <a href="/login/gerente" class="btn-text">Painel Corporativo</a>
+            <a href="/login/cliente" class="btn-primary">Entrar</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-gradient"></div>
+        
+        <div class="hero-content">
+            <div class="badge">
+                <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+                Nova Coleção 2026
+            </div>
+            
+            <h1>O Poder da<br>Tecnologia <span>Premium.</span></h1>
+            
+            <p>Descubra uma curadoria exclusiva dos melhores eletrônicos e hardwares de alta performance projetados para profissionais e entusiastas.</p>
+            
+            <div class="hero-buttons">
+                <a href="/login/cliente" class="btn-shop">
+                    Acessar a Loja
+                    <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+                </a>
+                <a href="/cadastro/cliente" class="btn-secondary">
+                    Criar Conta
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
